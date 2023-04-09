@@ -32,4 +32,25 @@ class ApplicationController < ActionController::Base
 
     render({ :template => "calculation_templates/sqrt_results.html.erb" })
   end
+
+  def blank_pay_form
+    render({ :template => "calculation_templates/pay_form.html.erb" })
+  end
+
+  def calculate_pay
+    @apr = "%.4f" % params.fetch("apr")
+    @years = params.fetch("years").to_i
+    @p = params.fetch("principal").to_f
+    @principal = format("$%.2f", params.fetch("principal")).gsub(/(\d)(?=(\d{3})+(?!\d))/, '\\1,')
+    rate = @apr.to_f / 100
+    r = rate.to_f / 12
+    pv = @p
+    n = @years * 12
+    num = r.to_f * @p
+    den = 1 - (1 + r) ** -n
+    @calc = num / den
+    @pay = @calc.to_s(:currency)
+
+    render({ :template => "calculation_templates/pay_results.html.erb" })
+  end
 end
