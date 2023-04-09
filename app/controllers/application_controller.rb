@@ -26,9 +26,9 @@ class ApplicationController < ActionController::Base
   end
 
   def calculate_sqrt
-    @num = params.fetch("user_number").to_i
-    @numf = @num.to_f
-    @result = @numf * 0.5
+    @num = params.fetch("user_number")
+
+    @result = (@num.to_f ** 0.5)
 
     render({ :template => "calculation_templates/sqrt_results.html.erb" })
   end
@@ -38,13 +38,14 @@ class ApplicationController < ActionController::Base
   end
 
   def calculate_pay
-    @apr = "%.4f" % params.fetch("apr")
+    @apr_raw = params.fetch("apr").to_f
+    @apr = @apr_raw.to_s(:percentage, { :precision => 4 })
     @years = params.fetch("years").to_i
     @p = params.fetch("principal").to_f
-    @principal = format("$%.2f", params.fetch("principal")).gsub(/(\d)(?=(\d{3})+(?!\d))/, '\\1,')
+    @principal = @p.to_s(:currency)
     rate = @apr.to_f / 100
     r = rate.to_f / 12
-    pv = @p
+    pv = @principal
     n = @years * 12
     num = r.to_f * @p
     den = 1 - (1 + r) ** -n
